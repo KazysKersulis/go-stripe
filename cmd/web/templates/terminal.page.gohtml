@@ -8,6 +8,8 @@
 <h2 class="mt-3 text-center">Virtual Terminal</h2>
 <hr/>
 
+<div class="alert alert-danger text-center d-none" id="card-messages"></div> 
+
 <form action="/payment-succeeded" method="post"
     name="charge_form" id="charge_form"
     class="d-block needs-validation charge-form"
@@ -40,6 +42,11 @@
 <hr>
 
 <a id="pay-button" href="javascrip:void(0)" class="btn btn-primary" onclick="val()">Charge Card</a>
+<div id="processing-payment" class="text-center d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 
 {{end}}
 
@@ -50,12 +57,28 @@
     let card;
     let stripe;
     const cardMessages = document.getElementById("card-messages");
+    const payButton = document.getElementById("pay-button");
+    const processing = document.getElementById("processing-payment");
     
 
     stripe = Stripe('pk_test_51KpysIDLz1yoJBCwp91ZcseMjEyQ433QxWRkYo5xG9kdOQVhIZ0PETYWDcJqrAf0VjSJ9S04efAS7ByTA2p0GhCP00PnfSSMzd');
 
+    function hidePayButton() {
+        // in case the use clicks on the pay button more than once
+        payButton.classList.add("d-none");
+        processing.classList.remove("d-none");
+    }
+
     function val() {
-        
+        let form = document.getElementById("charge_form");
+        if (form.checkValidity() === false) {
+            this.event.preventDefault();
+            this.event.stopPropagation();
+            form.classList.add("was-validated");
+            return;
+        }
+        form.classList.add("was-validated");
+        hidePayButton();
     }
 
     (function() {
